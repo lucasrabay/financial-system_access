@@ -175,3 +175,4 @@ cython_debug/
 
 model_data.csv
 classification_model_data.csv
+data/cleaned_data_dummies.csv
