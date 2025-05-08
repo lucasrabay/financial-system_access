@@ -2,15 +2,16 @@
 """Import Modules"""
 
 import pandas as pd
-from pandas.errors import *
+from pandas.errors import EmptyDataError
 import streamlit as st
 from streamlit_echarts import st_echarts
 from pathlib import Path
-import pickle
 import numpy as np
 
 import torch
 import torch.nn as nn
+
+from ..ordinal_model import PowerfulOrdinalNN
 
 
 class Simulator:
@@ -24,10 +25,17 @@ class Simulator:
         self.models_path = self.app_path.parent / "models"
         self.data_path = self.app_path.parent / "data"
 
-        # self.best_model = pickle.load(open(self.models_path/"best_ordinal_nn_model.pkl", "rb"))
-        # self.best_model_params = self.best_model["results"]
+        @st.cache_resource
+        def load_ordinal_model(path: Path):
+            # instantiate your network architecture
+            model = PowerfulOrdinalNN(in_features=154, hidden1=128, hidden2=64, out_features=2)  
+            # load weights
+            ckpt = torch.load(path, map_location="cpu")
+            model.load_state_dict(ckpt["model_state_dict"])
+            model.eval()
+            return model
 
-        self.int_model = pickle.load(open(self.models_path/"basic_logistic_regression.pkl", "rb"))
+        self.ordinal_model = load_ordinal_model(self.models_path / "best_ordinal_nn_model.pth")
 
 
 
@@ -45,23 +53,15 @@ class Simulator:
 
 
     # kind of a back end
-    def predict_class(_self, _dataframe: pd.DataFrame) -> tuple[int, float]:
-        """
-        Predicts the class and the probability of financial worries
-        Returns the worry class and the probability predicted
-        """
-
-        if _dataframe.empty:
-            raise EmptyDataError("O DataFrame fornecido para previsão está vazio")
-
-        try:
-            pred_class = _self.int_model.predict(_dataframe)
-            pred_proba = _self.int_model.predict_proba(_dataframe)
-
-        except Exception as error:
-            raise OSError(error) from error
-
-        return pred_class, pred_proba
+    def predict_class(self, df: pd.DataFrame):
+        if df.empty:
+            raise EmptyDataError("O DataFrame está vazio")
+        x = torch.tensor(df.values, dtype=torch.float32)
+        with torch.no_grad():
+            logits = self.ordinal_model(x)
+            probs  = torch.softmax(logits, dim=1).numpy()
+            preds  = probs.argmax(axis=1)
+        return preds, probs
 
 
 
