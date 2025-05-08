@@ -9,6 +9,8 @@ from pathlib import Path
 import pickle
 import numpy as np
 
+import torch
+import torch.nn as nn
 
 
 class Simulator:
@@ -25,8 +27,8 @@ class Simulator:
         # self.best_model = pickle.load(open(self.models_path/"best_ordinal_nn_model.pkl", "rb"))
         # self.best_model_params = self.best_model["results"]
 
-        # self.int_model = pickle.load(open(self.models_path/"basic_logistic_regression.pkl", "rb"))
-        # self.int_model_params = self.int_model["results"]
+        self.int_model = pickle.load(open(self.models_path/"basic_logistic_regression.pkl", "rb"))
+
 
 
     def __call__(self):
@@ -43,28 +45,24 @@ class Simulator:
 
 
     # kind of a back end
-    @st.cache_data(show_spinner=False)
-    def predict_class(dataframe: pd.DataFrame, params) -> tuple[int, float]:
+    def predict_class(_self, _dataframe: pd.DataFrame) -> tuple[int, float]:
         """
         Predicts the class and the probability of financial worries
         Returns the worry class and the probability predicted
-
-        Params:
-        dataframe: the pd.DataFrame containing the features to be predicted
-        params: the params of the model used to predict the final class/proba
         """
 
-        if dataframe.empty:
-            raise EmptyDataError("O Dataframe fornecido para previsão está vazio")
+        if _dataframe.empty:
+            raise EmptyDataError("O DataFrame fornecido para previsão está vazio")
 
         try:
-            pred_class = params.predict(dataframe), 
-            pred_proba = params.predict_proba(dataframe)
+            pred_class = _self.int_model.predict(_dataframe)
+            pred_proba = _self.int_model.predict_proba(_dataframe)
 
         except Exception as error:
             raise OSError(error) from error
 
         return pred_class, pred_proba
+
 
 
     def data_input(self):
@@ -142,6 +140,10 @@ class Simulator:
                 )
 
                 country_cols = [col for col in dummies_data.columns if "economy" in col.lower()]
+                country_cols.remove("economycode")
+                country_cols.remove("economy_China")
+
+                col1, col2 = st.columns([5, 8])
 
                 df_temp = (
                     pd.DataFrame({
@@ -156,11 +158,19 @@ class Simulator:
                                 .drop(columns="country")
                                 ).T
                 
+                
                 df_temp.columns = df_temp.iloc[0, :]
                 df_temp = df_temp[1:]
                 df_temp.index = [0]
+                df_temp = df_temp.rename(columns={"economy_Côte d'Ivoire": "economy_CÃ´te d'Ivoire",
+                                        "economy_Türkiye": "economy_TÃ¼rkiye"})
 
                 df = pd.concat([df, df_temp], axis=1)
+
+                class_, proba = self.predict_class(df)
+
+                st.write(class_)
+                st.write(proba)
 
                 c1.write("#")
 

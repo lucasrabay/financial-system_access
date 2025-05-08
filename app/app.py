@@ -11,8 +11,6 @@ models_path = app_path.parent / "models"
 data_path = app_path.parent / "data"
 
 
-
-
 def render_page():
     """Renders current page"""
 
@@ -40,11 +38,6 @@ def render_page():
         <p style='margin-top: 10px;'>&nbsp;</p>
         """, unsafe_allow_html=True)
 
-    with st.sidebar:
-        
-        st.logo(str(static_path / "logo_lema.png"), 
-                    size="large")
-        st.write("#")
 
     dash = st.Page("app_pages/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True)
     simulator = st.Page("app_pages/simulations.py", title="Simulator", icon=":material/speed:")
@@ -58,5 +51,13 @@ def render_page():
     pg.run()
     col1, col2, col3 = st.columns([3, 2, 2])
     col2.download_button("Technical Report", str(static_path / "relatorio.pdf"), "technical_report.pdf")
+
+    with st.sidebar:
+        
+        st.logo(str(static_path / "logo_lema.png"), 
+                    size="large")
+        st.write("#")
+
+        
 
 render_page()
