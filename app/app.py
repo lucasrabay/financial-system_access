@@ -57,7 +57,6 @@ def render_page():
         st.logo(str(static_path / "logo_lema.png"), 
                     size="large")
         st.write("#")
-
         st.markdown("""
             <style>
                 .dev-row {

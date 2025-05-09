@@ -25,17 +25,14 @@ class Simulator:
         self.models_path = self.app_path.parent / "models"
         self.data_path = self.app_path.parent / "data"
 
-        @st.cache_resource
         def load_ordinal_model(path: Path):
             model = PowerfulOrdinalNN(in_features=154, hidden1=128, hidden2=64, out_features=2)  
             ckpt = torch.load(path, map_location="cpu")
-            model.load_state_dict(ckpt["model_state_dict"])
+            model.load_state_dict(ckpt)
             model.eval()
             return model
 
         self.ordinal_model = load_ordinal_model(self.models_path / "best_ordinal_nn_model.pth")
-
-
 
     def __call__(self):
 
@@ -156,21 +153,38 @@ class Simulator:
                                 .drop(columns="country")
                                 ).T
                 
-                
                 df_temp.columns = df_temp.iloc[0, :]
                 df_temp = df_temp[1:]
                 df_temp.index = [0]
                 df_temp = df_temp.rename(columns={"economy_Côte d'Ivoire": "economy_CÃ´te d'Ivoire",
                                         "economy_Türkiye": "economy_TÃ¼rkiye"})
+                
+                df_temp = df_temp.astype({col: int for col in df_temp.columns})
 
                 df = pd.concat([df, df_temp], axis=1)
 
+                for col in df_temp.columns:
+                    print(df[col].dtype)
+
                 class_, proba = self.predict_class(df)
 
-                st.write(class_)
-                st.write(proba)
+                dict_class = {
+                    0: "Low Stress",
+                    1: "Medium Stress",
+                    2: "High Stress"
+                }
+                class_id = int(class_[0]) if isinstance(class_, (np.ndarray, list)) else int(class_)
+                class_ = dict_class[class_id]
+                proba = proba[0][class_id]
 
-                c1.write("#")
+                with st.container():
+
+                    c1, c2 = st.columns(2)
+                    st.html("<span class='probas'></span>")
+
+                    c1.metric("Predicted Financial Stress Level", class_)
+                    c2.metric("Predicted Probabilities", f"{round(proba, 5) * 100}%")
+
 
 
 if __name__ == "__main__":
