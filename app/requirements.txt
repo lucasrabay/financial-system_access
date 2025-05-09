@@ -12,3 +12,4 @@ streamlit
 streamlit-echarts
 plotly
 geopandas
+folium
