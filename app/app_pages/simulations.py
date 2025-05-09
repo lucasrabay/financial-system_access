@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from ..ordinal_model import PowerfulOrdinalNN
+from ordinal_model import PowerfulOrdinalNN
 
 
 class Simulator:
@@ -27,9 +27,7 @@ class Simulator:
 
         @st.cache_resource
         def load_ordinal_model(path: Path):
-            # instantiate your network architecture
             model = PowerfulOrdinalNN(in_features=154, hidden1=128, hidden2=64, out_features=2)  
-            # load weights
             ckpt = torch.load(path, map_location="cpu")
             model.load_state_dict(ckpt["model_state_dict"])
             model.eval()

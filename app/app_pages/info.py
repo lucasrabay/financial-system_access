@@ -114,8 +114,18 @@ class About:
                 options = self.graphs.h_bar_plot(params_data)
                 st_echarts(options=options, theme="dark", height="600px", width="100%")
 
-            # with col2:
-                # PUT ACCURACY STATS
+            with col2:
+                st.html("<span class='probas'></span>")
+
+                st.markdown("""
+                        <h5>Precision Scores - Neural Network Model</h5>
+                            """, unsafe_allow_html=True)
+
+                c1, c2, c3 = st.columns(3)
+                c2.write("#")
+                c2.metric("Lower Class Precision", "68%")
+                c2.metric("Intermediate Class Precision", "51%")
+                c2.metric("Higher Class Precision", "64%")
                 
 
 

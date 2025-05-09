@@ -58,6 +58,53 @@ def render_page():
                     size="large")
         st.write("#")
 
+        st.markdown("""
+            <style>
+                .dev-row {
+                    display: flex;
+                    justify-content: center;
+                    gap: 40px;
+                    margin-top: 20px;
+                }
+                .dev-card {
+                    text-align: center;
+                    font-size: 16px;
+                }
+                .dev-card img {
+                    border-radius: 10px;
+                    width: 100px;
+                    margin-bottom: 5px;
+                }
+                .dev-card strong {
+                    display: block;
+                    margin-top: 5px;
+                }
+            </style>
+
+            <h4>This is the Financial Worry Model App <br><br>The main result of the final project of the Machine Learning Course in UFPB</h4>
+            <h4>Authors:</h4>
+            <div class="dev-row">
+                <div class="dev-card">
+                    <img src="https://avatars.githubusercontent.com/u/141172256?v=4" alt="Pedro Melo">
+                    <strong>Pedro Melo</strong>
+                </div>
+                <div class="dev-card">
+                    <img src="https://avatars.githubusercontent.com/u/140542061?v=4" alt="Lucas Rabay">
+                    <strong>Lucas Rabay</strong>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        st.write("#")
+        st.write("#")
+        st.write("#")
+
+        col1, col2, col3 = st.columns(3, vertical_alignment="center")
+
+        col1.image(str(static_path / "Brasão_UFPB.png"))
+        col2.image(str(static_path / "cdn.png"))
+        col3.image(str(static_path / "logo_lema.png"))
+
         
 
 render_page()

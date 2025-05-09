@@ -1,0 +1,14 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+jupyter
+tqdm
+torch
+torchvision
+torchaudio
+streamlit
+streamlit-echarts
+plotly
+geopandas

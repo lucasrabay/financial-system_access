@@ -481,6 +481,7 @@ class Graphs:
     def h_bar_plot(self, params_data):
 
         option = {
+            "color": "#fba725",
             "backgroundColor": "#0E1117",
             "title": {
                 "text": "Top Parameters - Logit Model"
