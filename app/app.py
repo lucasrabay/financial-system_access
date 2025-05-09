@@ -18,7 +18,7 @@ def render_page():
                    page_icon="🧠", 
                    layout="wide")
 
-    st.html("static/index.html")
+    st.html(Path(__file__).parent / "static/index.html")
 
     st.logo(str(static_path / "logo_lema.png"), 
             size="large")
